@@ -3,6 +3,7 @@
 #include <ESP8266WiFiMulti.h>
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
+#include <ArduinoOTA.h>
 
 // wifi
 ESP8266WiFiMulti wifiMulti;
@@ -13,7 +14,7 @@ const int stepsPerDose = 100;
 Stepper myStepper(stepsPerDose, D1, D2, D3, D4);
 int enA = D5;
 int enB = D6;
-int motorPower = 900;
+int motorPower = 1000;
 
 // ultrasonic
 long t;
@@ -21,23 +22,22 @@ int trigger = D8;
 int echo = D7;
 float distance;
 float percentageFood;
-float max_food = 23.50;
+float max_food = 27.00;
 
 // telegram
-#define BOTtoken "CHANGEME_TELEGRAM_TOKEN"
+#define BOTtoken "XXX"
 UniversalTelegramBot bot(BOTtoken, client);
 int Bot_mtbs = 1000;
 long Bot_lasttime;
 bool Start = false;
-
 
 void setup() {
   // Serial setup
   Serial.begin(115200);
 
   // Wifi connection setup
-  wifiMulti.addAP("CHANGEME_SSID1", "CHANGEME_SSID1_PASS");
-  wifiMulti.addAP("CHANGEME_SSID2", "CHANGEME_SSID2_PASS");
+  wifiMulti.addAP("XXX", "XXX");
+  wifiMulti.addAP("XXX", "XXX");
   while (wifiMulti.run() != WL_CONNECTED) {         // Wait for the Wi-Fi to connect: scan for Wi-Fi networks, and connect to the strongest of the networks above
     delay(1000);
     Serial.print('.');
@@ -51,7 +51,10 @@ void setup() {
   pinMode(echo, INPUT);
 
   // stepper speed
-  myStepper.setSpeed(50);
+  myStepper.setSpeed(40);
+
+  // OTA setup
+  ArduinoOTA.begin();
 }
 
 // calc remaining food in %
@@ -90,6 +93,16 @@ void feedCats() {
   delay(2000);
 }
 
+// clean feeder
+void cleanFeeder() {
+  analogWrite(enA, motorPower);
+  analogWrite(enB, motorPower);
+  myStepper.step(400);
+  analogWrite(enA, 0);
+  analogWrite(enB, 0);
+  delay(1000);
+}
+
 // telegram message handler
 void handleNewMessages(int numNewMessages) {
   Serial.println("handleNewMessages");
@@ -102,32 +115,46 @@ void handleNewMessages(int numNewMessages) {
     String from_name = bot.messages[i].from_name;
     if (from_name == "") from_name = "Guest";
 
-    if (text == "/food") {
+    if (text == "/feed") {
       if (percentageFood == 0.00) {
         bot.sendMessage(chat_id, "There's no food! (Distance: " + String(distance) + " cm)", "");
       }
       else {
         feedCats();
-        bot.sendMessage(chat_id, "Cats have been feeded! Remaining food: " + String(percentageFood) + " % (" + String(distance) + " cm)", "");
+        bot.sendMessage(chat_id, "Cats feeded! Remaining food: " + String(percentageFood) + " % (" + String(distance) + " cm)", "");
       }
     }
-    if (text == "/check") {
+    if (text == "/status") {
       calcRemainingFood();
       char buffer[5];
       bot.sendMessage(chat_id, "Remaining food: " + String(percentageFood) + " % (Distance: " + String(distance) + " cm)", "");
     }
+    if (text == "/clean") {
+      feedCats();
+      char buffer[5];
+      bot.sendMessage(chat_id, "Feader cleaned. Remaining food: " + String(percentageFood) + " % (Distance: " + String(distance) + " cm)", "");
+    }
+    if (text == "/ip") {
+      String catFeederIP = WiFi.localIP().toString();
+      bot.sendMessage(chat_id, "catFeeder local IP address: " + (catFeederIP), "");
+    }
 
     if (text == "/help") {
       String welcome = "Welcome to the most awesome ESP8266 catFeeder, " + from_name + "!\n";
-      welcome += "/food : Delivers one dose of food.\n";
-      welcome += "/check : Returs how much food remains.\n";
+      welcome += "/clean : Cleans the feeder regardless of whether or not there is food.\n";
+      welcome += "/feed : Delivers one dose of feed.\n";
+      welcome += "/help : Outputs this help message.\n";
+      welcome += "/ip : Prints catFeeder local IP.\n";
+      welcome += "/status : Returns remaining feed quantity.\n";
       bot.sendMessage(chat_id, welcome, "Markdown");
     }
   }
 }
 
 void loop() {
+  ArduinoOTA.handle();
   calcRemainingFood();
+  Serial.println(WiFi.localIP());
   if (millis() > Bot_lasttime + Bot_mtbs)  {
     int numNewMessages = bot.getUpdates(bot.last_message_received + 1);
 
