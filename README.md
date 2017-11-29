@@ -67,4 +67,4 @@ Necessary libraries:
 	#include <UniversalTelegramBot.h>
 
 ## How to control the cat feeder via Telegram bot:
-![](https://user-images.githubusercontent.com/22028245/33085759-e623ed60-cee5-11e7-80ef-c12881b39a53.jpg)
+![](https://user-images.githubusercontent.com/22028245/33397924-848a583c-d54d-11e7-86c7-b1a0c73cc42d.jpg)
