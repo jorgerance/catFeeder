@@ -139,7 +139,7 @@ void handleNewMessages(int numNewMessages) {
       bot.sendMessage(chat_id, "catFeeder local IP address: " + (catFeederIP), "");
     }
 
-    if (text == "/help") {
+    if (text == "/help" || text == "/start") {
       String welcome = "Welcome to the most awesome ESP8266 catFeeder, " + from_name + "!\n";
       welcome += "/clean : Cleans the feeder regardless of whether or not there is food.\n";
       welcome += "/feed : Delivers one dose of feed.\n";
