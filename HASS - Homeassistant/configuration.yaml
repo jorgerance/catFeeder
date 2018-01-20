@@ -1,0 +1,36 @@
+sensor:
+  - platform: mqtt
+    name: 'cats last fed mqtt'
+    state_topic: 'casa/catfeeder/lastfed'
+  - platform: mqtt
+    name: 'catfeeder remaining'
+    state_topic: 'casa/catfeeder/remaining'   
+    unit_of_measurement: '%'
+  - platform: template
+    sensors:
+      cats_fed:
+        friendly_name: "Cats Fed at:"
+        value_template: "{{ as_timestamp(states.sensor.cats_last_fed_mqtt.state) | timestamp_custom(' %d/%m %H:%M ')  }}"
+
+script:        
+  '57658975357': # unique script id
+    alias: Feed the cats
+    sequence:
+      - service: mqtt.publish        
+        data_template:
+          topic: 'casa/catfeeder/feed'
+          payload: 'feed'        
+
+Customize:
+  script.57658975357:
+    icon: mdi:paw        
+
+group:
+  catfeeder:
+    icon: mdi:paw
+    name: CatFeeder
+    entities:
+      - script.57658975357
+      - sensor.catfeeder_remaining
+      - sensor.cats_fed
+      
