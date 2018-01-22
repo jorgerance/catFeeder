@@ -6,7 +6,7 @@
 #include <NTPClient.h>
 
 // wifi
-const char* ssid = "REPLACEMEe"; //type your WIFI information inside the quotes
+const char* ssid = "REPLACEME"; //type your WIFI information inside the quotes
 const char* password = "REPLACEME";
 WiFiClient espClient;
 
