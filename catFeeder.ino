@@ -34,11 +34,12 @@ const char* remaining_topic = "home/catfeeder/remaining"; //Remain % fix distanc
 const char* feed_topic = "home/catfeeder/feed";  // command topic
 
 // stepper
+const int steps = 200; //REPLACEME this is the number of steps of the motor for a 360° rotation.
 const int stepsPerDose = 50; //REPLACEME as you wish, mine was perfect at about 45-50 steps
-Stepper myStepper(stepsPerDose, D1, D3, D2, D4); // you may want to REPLACEME this based on how you cabled the motor.
+Stepper myStepper(steps, D1, D3, D2, D4); // you may want to REPLACEME this based on how you cabled the motor.
 int enA = D5;
 int enB = D6;
-int motorPower = 990; // it works... not sure what does this do. torque?
+//int motorPower = 990; // legacy.. for using pwm
 
 // ultrasonic
 long t;
@@ -143,11 +144,11 @@ void feedCats() {
   String formattedTime = timeClient.getFullFormattedTime();
   char charBuf[20];
   formattedTime.toCharArray(charBuf, 20);
-  analogWrite(enA, motorPower);
-  analogWrite(enB, motorPower);
+  digitalWrite(enA, HIGH);  // Enable motors, i dont see the point in pwm with a stepper?
+  digitalWrite(enB, HIGH);
   myStepper.step(stepsPerDose);
-  analogWrite(enA, 0);
-  analogWrite(enB, 0);
+  digitalWrite(enA, LOW);
+  digitalWrite(enB, LOW);
   delay(2000); // you may wanna change this based on how many times you press te button continously 
   client.publish(lastfed_topic, charBuf ); // Publishing time of feeding to MQTT Sensor
   Serial.print("Fed at: ");
