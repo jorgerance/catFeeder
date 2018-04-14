@@ -140,16 +140,16 @@ void callback(char* topic, byte* payload, unsigned int length) {
 // feeds cats
 void feedCats() {
   digitalWrite(2, LOW); // Turn on onboard LED
-  timeClient.update();
-  String formattedTime = timeClient.getFullFormattedTime();
-  char charBuf[20];
-  formattedTime.toCharArray(charBuf, 20);
   digitalWrite(enA, HIGH);  // Enable motors, i dont see the point in pwm with a stepper?
   digitalWrite(enB, HIGH);
   myStepper.step(stepsPerDose);
   digitalWrite(enA, LOW);
   digitalWrite(enB, LOW);
   delay(2000); // you may wanna change this based on how many times you press te button continously 
+  timeClient.update();   // could this fail?
+  String formattedTime = timeClient.getFullFormattedTime();
+  char charBuf[20];
+  formattedTime.toCharArray(charBuf, 20);
   client.publish(lastfed_topic, charBuf ); // Publishing time of feeding to MQTT Sensor
   Serial.print("Fed at: ");
   Serial.print(charBuf);
