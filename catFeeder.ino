@@ -189,17 +189,6 @@ void calcRemainingFood() {
   delay(500);
 }
 
-// clean feeder
-void cleanFeeder() {
-  analogWrite(enA, motorPower);
-  analogWrite(enB, motorPower);
-  myStepper.step(400); // should be plenty
-  analogWrite(enA, 0);
-  analogWrite(enB, 0);
-  delay(1000);
-}
-
-
 void reconnect() {
   // Loop until we're reconnected, i may wanna check for pushbutton here somewhere in case of wifi disaster?
   while (!client.connected()) {
