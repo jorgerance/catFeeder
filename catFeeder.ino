@@ -1,3 +1,5 @@
+#include <NTPClient.h>
+
 // Look for all "REPLACEME" before uploading the code.
 #include <Stepper.h>
 #include <ESP8266WiFi.h>
@@ -147,7 +149,7 @@ void feedCats() {
   digitalWrite(enB, LOW);
   delay(2000); // you may wanna change this based on how many times you press te button continously 
   timeClient.update();   // could this fail?
-  String formattedTime = timeClient.getFullFormattedTime();
+  String formattedTime = timeClient.getFormattedDate();
   char charBuf[20];
   formattedTime.toCharArray(charBuf, 20);
   client.publish(lastfed_topic, charBuf ); // Publishing time of feeding to MQTT Sensor
