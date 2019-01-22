@@ -1,3 +1,5 @@
+#include <NTPClient.h>
+
 // Look for all "REPLACEME" before uploading the code.
 #include <Stepper.h>
 #include <ESP8266WiFi.h>
@@ -147,10 +149,10 @@ void feedCats() {
   digitalWrite(enB, LOW);
   delay(2000); // you may wanna change this based on how many times you press te button continously 
   timeClient.update();   // could this fail?
-  String formattedTime = timeClient.getFullFormattedTime();
+  String formattedTime = timeClient.getFormattedDate();
   char charBuf[20];
   formattedTime.toCharArray(charBuf, 20);
-  client.publish(lastfed_topic, charBuf ); // Publishing time of feeding to MQTT Sensor
+  client.publish(lastfed_topic, charBuf, true); // Publishing time of feeding to MQTT Sensor retain true
   Serial.print("Fed at: ");
   Serial.print(charBuf);
   Serial.println();
@@ -183,20 +185,9 @@ void calcRemainingFood() {
   Serial.println(" %");
   char charBuf[6];
   int ret = snprintf(charBuf, sizeof charBuf, "%f", percentageFood);  // Translate float to char before publishing...
-  client.publish(remaining_topic, charBuf ); // Publishing remaining food to MQTT Sensor
+  client.publish(remaining_topic, charBuf, true); // Publishing remaining food to MQTT Sensor retain true
   delay(500);
 }
-
-// clean feeder
-void cleanFeeder() {
-  analogWrite(enA, motorPower);
-  analogWrite(enB, motorPower);
-  myStepper.step(400); // should be plenty
-  analogWrite(enA, 0);
-  analogWrite(enB, 0);
-  delay(1000);
-}
-
 
 void reconnect() {
   // Loop until we're reconnected, i may wanna check for pushbutton here somewhere in case of wifi disaster?
