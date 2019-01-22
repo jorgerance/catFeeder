@@ -152,7 +152,7 @@ void feedCats() {
   String formattedTime = timeClient.getFormattedDate();
   char charBuf[20];
   formattedTime.toCharArray(charBuf, 20);
-  client.publish(lastfed_topic, charBuf ); // Publishing time of feeding to MQTT Sensor
+  client.publish(lastfed_topic, charBuf, true); // Publishing time of feeding to MQTT Sensor retain true
   Serial.print("Fed at: ");
   Serial.print(charBuf);
   Serial.println();
@@ -185,7 +185,7 @@ void calcRemainingFood() {
   Serial.println(" %");
   char charBuf[6];
   int ret = snprintf(charBuf, sizeof charBuf, "%f", percentageFood);  // Translate float to char before publishing...
-  client.publish(remaining_topic, charBuf ); // Publishing remaining food to MQTT Sensor
+  client.publish(remaining_topic, charBuf, true); // Publishing remaining food to MQTT Sensor retain true
   delay(500);
 }
 
