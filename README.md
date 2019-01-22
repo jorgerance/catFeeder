@@ -55,16 +55,12 @@ Necessary libraries:
 	#include <ESP8266WiFi.h>
 	#include <ArduinoOTA.h>
 	#include <PubSubClient.h>
-	#include <NTPClient.h> (https://github.com/arduino-libraries/NTPClient/releases)
+	#include <NTPClient.h> (using a fork for leveraging getFormattedDate() find it here: https://github.com/taranais/NTPClient/releases)
 
 
 ## How to control the cat feeder via mqtt/Home Assistant:
-just publish
-    feed
-
-
-to the MQTT command channel, which if you dont change anything is
+just publish "feed" to the MQTT command channel, which if you dont change anything is
     home/catfeeder/feed
 
-you can use the script i provided under the HASS folder.
+You can use the script i provided under the HASS folder.
 
