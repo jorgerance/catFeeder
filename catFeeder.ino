@@ -34,6 +34,7 @@ PubSubClient client(espClient);
 const char* lastfed_topic = "home/catfeeder/lastfed"; // UTF date
 const char* remaining_topic = "home/catfeeder/remaining"; //Remain % fix distance above
 const char* feed_topic = "home/catfeeder/feed";  // command topic
+const char* willTopic = "home/catfeeder/LWT";  // Last Will and Testiment topic
 
 // stepper
 const int steps = 200; //REPLACEME this is the number of steps of the motor for a 360° rotation.
@@ -194,7 +195,8 @@ void reconnect() {
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
-    if (client.connect(SENSORNAME, mqtt_username, mqtt_password)) {
+    if (client.connect(SENSORNAME, mqtt_username, mqtt_password, willTopic, 1, true, "Offline")) {
+      client.publish(willTopic,"Online", true);
       Serial.println("connected");
       // ... and resubscribe
       client.subscribe(feed_topic);;

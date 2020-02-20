@@ -5,6 +5,9 @@ sensor:
   - platform: mqtt
     name: 'catfeeder remaining'
     state_topic: 'home/catfeeder/remaining'   
+    availability_topic: 'home/catfeeder/LWT'
+    payload_available: 'Online'
+    payload_not_available: 'Offline'
     unit_of_measurement: '%'
   - platform: template
     sensors:
